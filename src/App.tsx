@@ -23,6 +23,11 @@ function useTheThing() {
     const myRandNumber = Math.floor(Math.random() * 10000).toString();
     if (!localStorage.getItem("thing")) {
       localStorage.setItem("thing", myRandNumber);
+
+      if (localStorage.getItem("thing") !== myRandNumber) {
+        setData((prev) => ({ ...prev, local: "did not set! " + myRandNumber }));
+      }
+
       setData((prev) => ({ ...prev, myRandNumber }));
     }
 
