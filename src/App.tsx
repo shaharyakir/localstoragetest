@@ -20,6 +20,15 @@ function useTheThing() {
   });
 
   useEffect(() => {
+    window.addEventListener("storage", (e) => {
+      setData((prev) => ({
+        ...prev,
+        storageEventKey: e.key,
+        storageEventNewValue: e.newValue,
+        storageEventOldValue: e.oldValue,
+      }));
+    });
+
     const myRandNumber = Math.floor(Math.random() * 10000).toString();
     if (!localStorage.getItem("thing")) {
       localStorage.setItem("thing", myRandNumber);
@@ -33,7 +42,7 @@ function useTheThing() {
           ...prev,
           localRightAfterSet: localStorage.getItem("thing"),
         }));
-      }, 0);
+      }, 1);
 
       setData((prev) => ({ ...prev, myRandNumber }));
     }
