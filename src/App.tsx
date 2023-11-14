@@ -25,7 +25,17 @@ function useTheThing() {
       localStorage.setItem("thing", myRandNumber);
 
       if (localStorage.getItem("thing") !== myRandNumber) {
-        setData((prev) => ({ ...prev, zlocal: "did not set! " + myRandNumber }));
+        setData((prev) => ({
+          ...prev,
+          zlocal: "did not set! " + myRandNumber,
+        }));
+      } else {
+        setTimeout(() => {
+          setData((prev) => ({
+            ...prev,
+            zzlocal: "it was equal " + localStorage.getItem("thing"),
+          }));
+        }, 2000);
       }
 
       setData((prev) => ({ ...prev, myRandNumber }));
