@@ -85,11 +85,18 @@ function useTheThing() {
     );
   }, []);
 
-  return { data, stop: () => clearInterval(intervalId) };
+  return {
+    data,
+    stop: () => clearInterval(intervalId),
+    clear: () => {
+      localStorage.clear();
+      window.Telegram.WebApp.CloudStorage.removeItem("thing");
+    },
+  };
 }
 
 function App() {
-  const { data, stop } = useTheThing();
+  const { data, stop, clear } = useTheThing();
 
   return (
     <>
@@ -106,6 +113,13 @@ function App() {
         }}
       >
         stop
+      </button>
+      <button
+        onClick={() => {
+          clear();
+        }}
+      >
+        clear
       </button>
     </>
   );
