@@ -16,12 +16,14 @@ function useTheThing() {
     cloud: "",
     cloudSetError: "",
     cloudGetError: "",
+    myRandNumber: "",
   });
 
   useEffect(() => {
     const myRandNumber = Math.floor(Math.random() * 10000).toString();
     if (!localStorage.getItem("thing")) {
       localStorage.setItem("thing", myRandNumber);
+      setData((prev) => ({ ...prev, myRandNumber }));
     }
 
     try {
