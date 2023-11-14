@@ -24,19 +24,12 @@ function useTheThing() {
     if (!localStorage.getItem("thing")) {
       localStorage.setItem("thing", myRandNumber);
 
-      if (localStorage.getItem("thing") !== myRandNumber) {
+      setTimeout(() => {
         setData((prev) => ({
           ...prev,
-          zlocal: "did not set! " + myRandNumber,
+          localRightAfterSet: localStorage.getItem("thing"),
         }));
-      } else {
-        setTimeout(() => {
-          setData((prev) => ({
-            ...prev,
-            zzlocal: "it was equal " + localStorage.getItem("thing"),
-          }));
-        }, 2000);
-      }
+      }, 0);
 
       setData((prev) => ({ ...prev, myRandNumber }));
     }
