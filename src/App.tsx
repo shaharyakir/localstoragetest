@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Telegram: any;
+  }
+}
+
 function useTheThing() {
   const [data, setData] = useState({
     local: "",
