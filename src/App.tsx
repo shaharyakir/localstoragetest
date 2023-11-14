@@ -9,6 +9,8 @@ declare global {
 }
 
 function useTheThing() {
+  const [intervalId, setIntevalId] = useState(0);
+
   const [data, setData] = useState({
     local: "",
     cloud: "",
@@ -55,46 +57,56 @@ function useTheThing() {
   }, []);
 
   useEffect(() => {
-    setInterval(() => {
-      try {
-        window.Telegram.WebApp.CloudStorage.getItem("thing", (err, value) => {
-          if (err) {
-            setData((prev) => ({
-              ...prev,
-              cloudGetError: String(err),
-              cloud: "",
-            }));
-          } else {
-            setData((prev) => ({ ...prev, cloud: value }));
-          }
-        });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        setData((prev) => ({ ...prev, cloudGetError: e.toString() }));
-      }
+    setIntevalId(
+      setInterval(() => {
+        console.log("In loop");
+        try {
+          window.Telegram.WebApp.CloudStorage.getItem("thing", (err, value) => {
+            if (err) {
+              setData((prev) => ({
+                ...prev,
+                cloudGetError: String(err),
+                cloud: "",
+              }));
+            } else {
+              setData((prev) => ({ ...prev, cloud: value }));
+            }
+          });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+          setData((prev) => ({ ...prev, cloudGetError: e.toString() }));
+        }
 
-      setData((prev) => ({
-        ...prev,
-        local: localStorage.getItem("thing") || "",
-      }));
-    }, 1000);
+        setData((prev) => ({
+          ...prev,
+          local: localStorage.getItem("thing") || "",
+        }));
+      }, 1000)
+    );
   }, []);
 
-  return data;
+  return { data, stop: () => clearInterval(intervalId) };
 }
 
 function App() {
-  const x = useTheThing();
+  const { data, stop } = useTheThing();
 
   return (
     <>
-      {Object.entries(x).map(([key, value]) => (
+      {Object.entries(data).map(([key, value]) => (
         <div>
           {key}:{String(value)}
           <br />
           <br />
         </div>
       ))}
+      <button
+        onClick={() => {
+          stop();
+        }}
+      >
+        stop
+      </button>
     </>
   );
 }
