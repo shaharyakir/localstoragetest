@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getLockValue, tryWriteLock } from "./idb";
+import { drop, getLockValue, tryWriteLock } from "./idb";
 
 declare global {
   interface Window {
@@ -92,8 +92,9 @@ function App() {
         refresh
       </button>
       <button
-        onClick={() => {
+        onClick={async () => {
           localStorage.clear();
+          drop();
         }}
       >
         clear

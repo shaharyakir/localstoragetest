@@ -22,3 +22,7 @@ export async function getLockValue() {
   const db = await openDB("myDb", 1);
   return db.get("whatever", "lock");
 }
+
+export async function drop() {
+  await deleteDB("myDb");
+}
