@@ -118,8 +118,43 @@ function useTheThing() {
   };
 }
 
+function useTheThing2() {
+  const myRandNumber = Math.floor(Math.random() * 10000).toString();
+  const [data, setData] = useState({});
+
+  useEffect(() => {
+    if (!localStorage.getItem("thing")) {
+      localStorage.setItem("thing", myRandNumber);
+      localStorage.setItem("thing" + myRandNumber, myRandNumber);
+      setData((prev) => ({
+        ...prev,
+        myRandNumber,
+        numberInLocalStorage: localStorage.getItem("thing"),
+        keys: Object.keys(localStorage).join(","),
+      }));
+    }
+  }, []);
+
+  return data;
+}
+
+function useTheThing3() {
+  const [data, setData] = useState({});
+
+  return [
+    data,
+    () => {
+      setData((prev) => ({
+        ...prev,
+        newKeys: Object.keys(localStorage).join(","),
+      }));
+    },
+  ];
+}
+
 function App() {
-  const { data, stop, clear } = useTheThing();
+  const data = useTheThing2();
+  const [data2, refresh] = useTheThing3();
 
   return (
     <>
@@ -130,16 +165,26 @@ function App() {
           <br />
         </div>
       ))}
+      <br />
+      <br />
+      <br />
+      {Object.entries(data2).map(([key, value]) => (
+        <div>
+          {key}:{String(value)}
+          <br />
+          <br />
+        </div>
+      ))}
       <button
         onClick={() => {
-          stop();
+          (refresh as () => void)();
         }}
       >
-        stop
+        refresh
       </button>
       <button
         onClick={() => {
-          clear();
+          localStorage.clear();
         }}
       >
         clear
