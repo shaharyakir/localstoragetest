@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { drop, getLockValue, tryWriteLock } from "./idb";
+import { keyvalStore } from "./idb";
 
 declare global {
   interface Window {
@@ -11,13 +11,19 @@ declare global {
 
 function useTheThing2() {
   const myRandNumber = Math.floor(Math.random() * 10000).toString();
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    myRandNumber,
+  });
 
   useEffect(() => {
     (async () => {
+      const lockVal = await keyvalStore.get("lock");
+      setData((prev) => ({
+        ...prev,
+        lock: lockVal,
+      }));
       try {
-        tryWriteLock(myRandNumber);
-        const lockVal = await getLockValue();
+        await keyvalStore.setIfNotExists("lock", myRandNumber);
         setData((prev) => ({
           ...prev,
           lockInitial: lockVal,
@@ -30,16 +36,16 @@ function useTheThing2() {
       }
     })();
 
-    if (!localStorage.getItem("thing")) {
-      localStorage.setItem("thing", myRandNumber);
-      localStorage.setItem("thing" + myRandNumber, myRandNumber);
-      setData((prev) => ({
-        ...prev,
-        myRandNumber,
-        numberInLocalStorage: localStorage.getItem("thing"),
-        keys: Object.keys(localStorage).join(","),
-      }));
-    }
+    // if (!localStorage.getItem("thing")) {
+    //   localStorage.setItem("thing", myRandNumber);
+    //   localStorage.setItem("thing" + myRandNumber, myRandNumber);
+    //   setData((prev) => ({
+    //     ...prev,
+    //     myRandNumber,
+    //     numberInLocalStorage: localStorage.getItem("thing"),
+    //     keys: Object.keys(localStorage).join(","),
+    //   }));
+    // }
   }, []);
 
   return data;
@@ -51,11 +57,10 @@ function useTheThing3() {
   return [
     data,
     async () => {
-      const lock = await getLockValue();
+      const lock = await keyvalStore.get("lock");
       setData((prev) => ({
         ...prev,
         lock,
-        newKeys: Object.keys(localStorage).join(","),
       }));
     },
   ];
@@ -68,7 +73,7 @@ function App() {
   return (
     <>
       {Object.entries(data).map(([key, value]) => (
-        <div>
+        <div key={key}>
           {key}:{String(value)}
           <br />
           <br />
@@ -78,7 +83,7 @@ function App() {
       <br />
       <br />
       {Object.entries(data2).map(([key, value]) => (
-        <div>
+        <div key={key}>
           {key}:{String(value)}
           <br />
           <br />
@@ -94,7 +99,7 @@ function App() {
       <button
         onClick={async () => {
           localStorage.clear();
-          drop();
+          await keyvalStore.del("lock");
         }}
       >
         clear
